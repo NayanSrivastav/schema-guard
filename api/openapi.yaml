@@ -1,0 +1,89 @@
+openapi: "3.0.3"
+info:
+  title: "SchemaGuard Validation API"
+  version: "1.0.0"
+  description: "Enterprise runtime execution API for structural LLM validations and telemetry feedback loops."
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /v1/validate:
+    post:
+      summary: "Validates an unstructured LLM payload"
+      operationId: ValidatePayload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ValidationRequest"
+      responses:
+        '200':
+          description: "Successful validation assessment"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationResponse"
+        '400':
+          description: "Client error due to missing required routing parameters"
+
+  /v1/stats:
+    get:
+      summary: "Fetches system reliability timeseries metrics"
+      operationId: GetTelemetryStats
+      responses:
+        '200':
+          description: "JSON payload containing heatmap distributions natively"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TelemetryStats"
+
+components:
+  schemas:
+    ValidationRequest:
+      type: object
+      required:
+        - schema_name
+        - payload
+      properties:
+        schema_name:
+          type: string
+          description: "The name of the schema configured in the Registry"
+        version:
+          type: string
+          default: "latest"
+        payload:
+          type: string
+          description: "Raw markdown string returned by Language Model"
+          
+    ValidationResponse:
+      type: object
+      required:
+        - status
+        - raw_json
+      properties:
+        status:
+          type: string
+          enum: [PASS, FAIL]
+        coerced_json:
+          type: string
+        raw_json:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValidationError"
+            
+    ValidationError:
+      type: object
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+
+    TelemetryStats:
+      type: object
+      additionalProperties: true

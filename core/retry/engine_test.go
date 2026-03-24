@@ -114,6 +114,9 @@ func TestEngine_RetryUntilSuccess(t *testing.T) {
 	if res.TotalCost.TokensIn != totalIn {
 		t.Errorf("expected token tracking sum to match %d, got %d", totalIn, res.TotalCost.TokensIn)
 	}
+	if res.TotalCost.TokensOut != totalOut {
+		t.Errorf("expected token tracking sum to accurately map %d, got %d", totalOut, res.TotalCost.TokensOut)
+	}
 }
 
 func TestCircuitBreaker_OpensAndBlocks(t *testing.T) {

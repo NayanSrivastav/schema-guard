@@ -129,7 +129,7 @@ func TestExtractJSON(t *testing.T) {
 		{"no codeblock square", "some text \n [{\"id\": 1}] \n text", `[{"id": 1}]`, false},
 		{"pure json object", `{"id": 1}`, `{"id": 1}`, false},
 		{"pure json array", `[1, 2, 3]`, `[1, 2, 3]`, false},
-		{"malformed codeblock", "```json{\"id\": 1}", "", true},
+		{"malformed codeblock", "```json{\"id\": 1}", `{"id": 1}`, false},
 		{"no brackets", `just some plain string without brackets`, "", true},
 		{"json prefix suffix", `prefix {"key":"val"} suffix`, `{"key":"val"}`, false},
 		{"array prefix suffix", `prefix [1,2] suffix`, `[1,2]`, false},

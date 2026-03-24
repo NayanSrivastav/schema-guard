@@ -5,35 +5,29 @@ import './index.css';
 
 export default function App() {
   const [data, setData] = useState<any>(null);
+  const [selectedField, setSelectedField] = useState<string | null>(null);
 
   useEffect(() => {
-    // In production, this hits the real Go API endpoints defined in `api/server.go`.
-    // Simulating REST API latency fetching for local rendering MVP
-    setTimeout(() => {
-        setData({
-            kpi: {
-                pass_rate: 92.4,
-                validations_month: 42104,
-                cost_saved: 842.10
-            },
-            heatmap: [
-                { name: "user.address.zipcode", failures: 412 },
-                { name: "items[].price", failures: 234 },
-                { name: "metadata.tags", failures: 182 },
-                { name: "config.flags", failures: 89 },
-                { name: "id", failures: 45 },
-            ],
-            timeseries: [
-                { day: "Mon", success: 4000, errors: 300 },
-                { day: "Tue", success: 5200, errors: 420 },
-                { day: "Wed", success: 6120, errors: 390 },
-                { day: "Thu", success: 5900, errors: 800 },
-                { day: "Fri", success: 7200, errors: 210 },
-                { day: "Sat", success: 6800, errors: 190 },
-                { day: "Sun", success: 6900, errors: 150 },
-            ]
-        });
-    }, 500);
+    const fetchLiveTelemetry = async () => {
+      try {
+        const response = await fetch('http://localhost:8085/v1/stats');
+        const json = await response.json();
+        
+        // Failsafe mappings to gracefully handle empty null states explicitly safely 
+        if (!json.heatmap || json.heatmap.length === 0) {
+            json.heatmap = [{ name: "No errors recorded yet", failures: 0 }];
+        }
+        
+        setData(json);
+      } catch (err) {
+        console.error("SchemaGuard Node Connection Severed:", err);
+      }
+    };
+    
+    fetchLiveTelemetry(); // Initial physical hook
+    const interval = setInterval(fetchLiveTelemetry, 2000); // 2s live operational polling loop mapping dynamically 
+    
+    return () => clearInterval(interval);
   }, []);
 
   if (!data) return <div style={{ color: "white", padding: "2rem", display: "flex", alignItems: "center", gap: "10px" }}><Activity className="lucide-spin" /> Initializing Telemetry Engine...</div>;
@@ -55,19 +49,22 @@ export default function App() {
       <div className="kpi-grid">
         <div className="glass-panel kpi-card">
           <h3>Overall Pass Rate (7d)</h3>
-          <p className="value">{data.kpi.pass_rate}%</p>
-          <div className="trend up"><ArrowUpRight size={16} /> 2.1% improvement directly from Prompt Coercion fixes</div>
+          <p className="value">{data.kpi.pass_rate.toFixed(1)}%</p>
+          <div className="trend up" style={{ color: "var(--text-secondary)" }}><ArrowUpRight size={16} /> Live passing metrics computed directly over internal network traffic</div>
         </div>
         <div className="glass-panel kpi-card">
           <h3>Total Executions (30d)</h3>
           <p className="value">{data.kpi.validations_month.toLocaleString()}</p>
-          <div className="trend up"><ArrowUpRight size={16} /> 12.4% traffic scaling vs previous</div>
+          <div className="trend up" style={{ color: "var(--text-secondary)" }}><ArrowUpRight size={16} /> Absolute network connections strictly hitting the Go verification engine</div>
         </div>
         <div className="glass-panel kpi-card">
           <h3>Token Overhead Cost Saved</h3>
           <p className="value">${data.kpi.cost_saved.toFixed(2)}</p>
           <div className="trend down" style={{ color: "var(--text-secondary)" }}>
-            <ArrowDownRight size={16} /> Circuit breaker successfully prevented runaway cascade expenses
+            <ArrowDownRight size={16} /> 
+            {data.kpi.cost_saved > 0 
+              ? "Short-circuited failures safely preventing downstream LLM cascade expenses" 
+              : "Monitoring boundary layers seamlessly for structural formatting drifts"}
           </div>
         </div>
       </div>
@@ -110,7 +107,7 @@ export default function App() {
           </p>
           <div className="heatmap-list">
             {data.heatmap.map((item: any, idx: number) => (
-              <div key={idx} className="heatmap-item">
+              <div key={idx} className="heatmap-item" onClick={() => setSelectedField(item.name)}>
                 <span className="field">{item.name}</span>
                 <span className="count">{item.failures}</span>
               </div>
@@ -118,6 +115,24 @@ export default function App() {
           </div>
         </div>
       </div>
+
+      {selectedField && (
+        <div className="glass-panel" style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 1000, borderLeft: '4px solid var(--accent)', animation: 'slideIn 0.3s ease-out' }}>
+          <h4 style={{ margin: '0 0 0.5rem 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Activity size={16} color="var(--accent)" /> Deep Trace: <span style={{ fontFamily: 'monospace', color: '#ff7b72' }}>{selectedField}</span>
+          </h4>
+          <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)', maxWidth: '300px', lineHeight: '1.4' }}>
+            Historical payload forensics and Deep Tracing requires <b>SchemaGuard Enterprise</b>.
+            <br />
+            <button 
+              onClick={() => setSelectedField(null)} 
+              style={{ background: 'transparent', border: 'none', color: 'var(--accent)', marginTop: '0.8rem', cursor: 'pointer', padding: 0, fontWeight: 600 }}
+            >
+              Dismiss
+            </button>
+          </p>
+        </div>
+      )}
     </div>
   );
 }

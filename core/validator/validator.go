@@ -156,7 +156,7 @@ func formatErrors(err *jsonschema.ValidationError) []ValidationError {
 	return errs
 }
 
-// ExtractJSON tries to find a JSON block in a markdown text
+// ExtractJSON tries to find a JSON block in a markdown text cleanly tracking bracket pairs
 func ExtractJSON(input string) (string, error) {
 	start := strings.Index(input, "```json")
 	if start != -1 {
@@ -165,39 +165,44 @@ func ExtractJSON(input string) (string, error) {
 		start = strings.Index(input, "```")
 		if start != -1 {
 			input = input[start+3:]
-		} else {
-			// Find first '{' or '['
-			firstCurly := strings.Index(input, "{")
-			firstSquare := strings.Index(input, "[")
-			
-			if firstCurly == -1 && firstSquare == -1 {
-				return "", fmt.Errorf("no json block found")
-			}
-			
-			idx := firstCurly
-			if idx == -1 || (firstSquare != -1 && firstSquare < idx) {
-				idx = firstSquare
-			}
-			
-			idxEnd := strings.LastIndex(input, "}")
-			idxSqEnd := strings.LastIndex(input, "]")
-			
-			endIdx := idxEnd
-			if endIdx == -1 || (idxSqEnd != -1 && idxSqEnd > endIdx) {
-				endIdx = idxSqEnd
-			}
-			
-			if idx != -1 && endIdx != -1 && endIdx >= idx {
-			    return strings.TrimSpace(input[idx:endIdx+1]), nil
-			}
-			return "", fmt.Errorf("no json block found")
 		}
 	}
-	end := strings.Index(input, "```")
-	if end >= 0 {
-		return strings.TrimSpace(input[:end]), nil
+	
+	// Scan for the first array or object opening bounds natively
+	firstCurly := strings.Index(input, "{")
+	firstSquare := strings.Index(input, "[")
+	
+	if firstCurly == -1 && firstSquare == -1 {
+		return "", fmt.Errorf("no json block bounds found gracefully natively")
 	}
-	return strings.TrimSpace(input), nil
+	
+	idx := firstCurly
+	if idx == -1 || (firstSquare != -1 && firstSquare < idx) {
+		idx = firstSquare
+	}
+	
+	// Brace counting structural evaluation
+	if input[idx] == '{' {
+		balance := 0
+		for i := idx; i < len(input); i++ {
+			if input[i] == '{' { balance++ }
+			if input[i] == '}' { balance-- }
+			if balance == 0 {
+				return strings.TrimSpace(input[idx : i+1]), nil
+			}
+		}
+	} else if input[idx] == '[' {
+		balance := 0
+		for i := idx; i < len(input); i++ {
+			if input[i] == '[' { balance++ }
+			if input[i] == ']' { balance-- }
+			if balance == 0 {
+				return strings.TrimSpace(input[idx : i+1]), nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("no properly terminating json block found completely gracefully")
 }
 
 // CoerceHeuristics walks the generic interface and converts typical LLM mistakes like string "123" to integer 123
