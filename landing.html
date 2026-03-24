@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SchemaGuard - AI Reliability</title>
+    <style>
+        :root {
+            --bg-dark: #0d1117;
+            --bg-card: rgba(22, 27, 34, 0.65);
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --accent: #2f81f7;
+            --accent-glow: rgba(47, 129, 247, 0.3);
+            --success: #238636;
+            --danger: #da3633;
+            --border: rgba(48, 54, 61, 0.6);
+            --font-stack: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-stack);
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(47, 129, 247, 0.1), transparent 30%),
+                radial-gradient(circle at 90% 80%, rgba(35, 134, 54, 0.05), transparent 30%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 0 40px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin: 0;
+            background: linear-gradient(90deg, #ffffff, #8ab4f8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px var(--accent-glow);
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            margin-top: 15px;
+            font-weight: 300;
+        }
+
+        h2.section-title {
+            font-size: 2.2rem;
+            border-bottom: 2px solid var(--accent);
+            display: inline-block;
+            margin-bottom: 25px;
+            padding-bottom: 5px;
+            font-weight: 600;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Accordion Styles (Collapse Links) */
+        details {
+            margin-bottom: 15px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        summary {
+            padding: 18px 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            color: var(--text-main);
+            transition: background 0.2s;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        summary:hover {
+            background: rgba(47, 129, 247, 0.08);
+        }
+
+        summary::after {
+            content: '+';
+            font-size: 1.8rem;
+            color: var(--accent);
+            font-weight: 300;
+            transition: transform 0.3s ease;
+            line-height: 1;
+        }
+
+        details[open] summary {
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        details[open] summary::after {
+            transform: rotate(45deg);
+            color: var(--danger);
+        }
+
+        .details-content {
+            padding: 20px 25px;
+            color: var(--text-muted);
+            animation: slideDown 0.3s ease-out;
+            font-size: 1.05rem;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Code Blocks */
+        pre {
+            background: #010409;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            color: #c9d1d9;
+            font-size: 0.95rem;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        }
+
+        .keyword { color: #ff7b72; }
+        .string { color: #a5d6ff; }
+        .function { color: #d2a8ff; }
+        .comment { color: #8b949e; font-style: italic; }
+
+        /* Step-by-Step Layout */
+        .step {
+            display: flex;
+            margin-bottom: 40px;
+            gap: 25px;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, var(--accent), #1f6feb);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+            box-shadow: 0 0 15px var(--accent-glow);
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .step-content {
+            flex-grow: 1;
+        }
+
+        .step-content h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.4rem;
+            color: white;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(35, 134, 54, 0.2);
+            color: var(--success);
+            border: 1px solid rgba(35, 134, 54, 0.4);
+            margin-bottom: 15px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px;
+            margin-top: 60px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2.8rem; }
+            .step { flex-direction: column; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header>
+            <h1>SchemaGuard</h1>
+            <div class="subtitle">The automated bouncer protecting your software from AI hallucinations.</div>
+        </header>
+
+        <!-- What is it Layout -->
+        <section>
+            <h2 class="section-title">What is SchemaGuard?</h2>
+            <div class="glass-card">
+                <p>Imagine you hire a brilliant but slightly unpredictable assistant (the AI). You ask them to fill out a strictly formatted spreadsheet with numbers and dates. Sometimes they do it perfectly. Other times, they write a long paragraph instead of a simple number, spell their name backward, or completely forget a column.</p>
+                <p>When this happens in software, the entire program crashes. <strong>SchemaGuard is the supervisor standing perfectly between that AI and your app.</strong></p>
+                <p>If the AI gives the wrong format, SchemaGuard catches it before it breaks anything, taps the AI on the shoulder, shows it exactly what it did wrong, and forces it to try again until it's perfect.</p>
+            </div>
+        </section>
+
+        <!-- Deep Dive Collapse Menus -->
+        <section>
+            <h2 class="section-title">How It Works Behind the Scenes</h2>
+            
+            <details>
+                <summary>1. Coercion Mode: The "Auto-Fixer"</summary>
+                <div class="details-content">
+                    Sometimes the AI makes a tiny, silly mistake. It might write the number <code>"100"</code> wrapped in quotes (making it a text string) instead of a raw number <code>100</code>.<br><br>
+                    Normally, this crashes your app. But in Coercion Mode, SchemaGuard is smart enough to say, <i>"I know what you meant,"</i> automatically converts the text into a real number behind the scenes, and safely hands it to your application without needing to waste time or money asking the AI again.
+                </div>
+            </details>
+
+            <details>
+                <summary>2. Auto-Retry Engine: The "Try Again"</summary>
+                <div class="details-content">
+                    If the AI completely forgets a required field (like a customer's total price), SchemaGuard automatically intercepts the failure, grabs the exact error (e.g., <i>"Missing required field: Total Price"</i>), injects it back into a new prompt, and tells the AI: <strong>"You failed. Fix this specific missing field."</strong><br><br>
+                    It loops this until the AI produces perfectly formatted data.
+                </div>
+            </details>
+
+            <details>
+                <summary>3. The Circuit Breaker: Preventing Runaway Costs</summary>
+                <div class="details-content">
+                    AI models cost money every time you ask them a question. If an AI is severely confused and gets stuck in an infinite loop of failing, your credit card bill would explode in seconds.<br><br>
+                    Our <strong>Circuit Breaker</strong> acts as an emergency stop button. If the AI fails 5 times in a row, the circuit "trips" and locks the AI out temporarily. It stops spending your money, instantly throws an error to your developers, and protects your infrastructure from cascading token waste.
+                </div>
+            </details>
+        </section>
+
+        <!-- How to Use Section -->
+        <section style="margin-top: 60px;">
+            <h2 class="section-title">How To Use It (Quickstart)</h2>
+            <div class="glass-card">
+                
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Define the Rules</h3>
+                        <p style="color: var(--text-muted); margin-top: 0;">Tell SchemaGuard exactly what format you expect the AI to return using a standard JSON Schema.</p>
+<pre><code><span class="keyword">const</span> schema = {
+  <span class="string">"type"</span>: <span class="string">"object"</span>,
+  <span class="string">"properties"</span>: { 
+     <span class="string">"userId"</span>: { <span class="string">"type"</span>: <span class="string">"integer"</span> } 
+  },
+  <span class="string">"required"</span>: [<span class="string">"userId"</span>]
+};</code></pre>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Ask the AI</h3>
+                        <p style="color: var(--text-muted); margin-top: 0;">Normally, the AI might give you a conversational, broken response wrapped in markdown text blocks rather than pure code.</p>
+<pre><code><span class="comment"># The AI responds with:</span>
+<span class="string">"Sure! I'd love to help you with that. Here is your user ID!"</span>
+<span class="string">```json
+{"userId": "12345"} 
+```</span>
+<span class="string">"Hope that helps!"</span></code></pre>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Run It Through SchemaGuard</h3>
+                        <div class="badge">Offline Alpha Validation</div>
+                        <p style="color: var(--text-muted); margin-top: 0;">Pass the AI's messy output directly through our Python SDK. SchemaGuard strips out the conversational text, finds the data block, and runs the rigorous checks.</p>
+<pre><code><span class="keyword">from</span> schemaguard <span class="keyword">import</span> LocalValidator
+
+<span class="comment"># Load the bouncer</span>
+validator = <span class="function">LocalValidator</span>(schema)
+
+<span class="comment"># Check the AI's homework</span>
+is_valid, clean_data, errors = validator.<span class="function">validate</span>(ai_response)
+
+<span class="keyword">if</span> is_valid:
+    <span class="function">print</span>(<span class="string">"Success! Data is bulletproof:"</span>, clean_data)
+<span class="keyword">else</span>:
+    <span class="function">print</span>(<span class="string">"Hold up. Errors found:"</span>, errors)
+</code></pre>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <footer class="footer">
+            Built for modern LLM pipelines. SchemaGuard entirely prevents the hidden chaos of AI generation loops.<br>
+            <i>Reliably.ai • 2026</i>
+        </footer>
+
+    </div>
+
+    <script>
+        // Inline JS: Enhances the accordion behaviors to smoothly close others when one opens natively natively
+        const details = document.querySelectorAll('details');
+        
+        details.forEach((targetDetail) => {
+            targetDetail.addEventListener('click', () => {
+                // If the detail is being opened, close all other open details
+                if (!targetDetail.hasAttribute('open')) {
+                    details.forEach((detail) => {
+                        if (detail !== targetDetail && detail.hasAttribute('open')) {
+                            detail.removeAttribute('open');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
