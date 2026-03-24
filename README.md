@@ -2,6 +2,7 @@
 
 # 🛡️ SchemaGuard
 ### Structured Output Validator & Schema Enforcer for LLM Pipelines
+**Official Documentation:** [https://nayansrivastav.github.io/schema-guard/](https://nayansrivastav.github.io/schema-guard/)
 
 [![CI Pipeline](https://github.com/NayanSrivastav/schema-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/NayanSrivastav/schema-guard/actions)
 ![Coverage](https://img.shields.io/badge/Coverage-97.3%25-brightgreen.svg)
