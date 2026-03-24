@@ -4,6 +4,7 @@
 ### Structured Output Validator & Schema Enforcer for LLM Pipelines
 
 [![CI Pipeline](https://github.com/NayanSrivastav/schema-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/NayanSrivastav/schema-guard/actions)
+![Coverage](https://img.shields.io/badge/Coverage-97.3%25-brightgreen.svg)
 [![PyPI](https://img.shields.io/pypi/v/schemaguard)](https://pypi.org/project/schemaguard/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
