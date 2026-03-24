@@ -3,7 +3,7 @@
 # 🛡️ SchemaGuard
 ### Structured Output Validator & Schema Enforcer for LLM Pipelines
 
-[![Go](https://github.com/schemaguard/schemaguard/actions/workflows/ci.yml/badge.svg)](https://github.com/schemaguard/schemaguard/actions)
+[![CI Pipeline](https://github.com/NayanSrivastav/schema-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/NayanSrivastav/schema-guard/actions)
 [![PyPI](https://img.shields.io/pypi/v/schemaguard)](https://pypi.org/project/schemaguard/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
