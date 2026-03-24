@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "schemaguard"
-version = "0.1.0-alpha"
+version = "0.1.0"
 description = "Structured Output Validator & Schema Enforcer SDK"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -15,4 +15,4 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/schemaguard/schemaguard"
+Homepage = "https://github.com/NayanSrivastav/schema-guard"
