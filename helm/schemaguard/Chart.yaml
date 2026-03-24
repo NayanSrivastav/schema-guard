@@ -1,0 +1,6 @@
+apiVersion: v2
+name: schemaguard
+description: Structured Output Validator & Schema Enforcer for LLM Pipelines
+type: application
+version: 0.1.0-alpha
+appVersion: "1.0.0"

@@ -1,0 +1,28 @@
+# Default configuration limits explicitly defining replica scaling securely
+api:
+  replicaCount: 2
+  image:
+    repository: schemaguard/api
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 10m
+      memory: 64Mi
+
+dashboard:
+  replicaCount: 1
+  image:
+    repository: schemaguard/dashboard
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  service:
+    type: LoadBalancer # Externally exposes React physically logically internally
+    port: 80
+    targetPort: 5173
