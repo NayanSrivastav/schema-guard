@@ -5,7 +5,7 @@ The official Python client for SchemaGuard — a runtime validation, monitoring,
 ## Installation
 
 ```bash
-pip install schemaguard
+pip install schema-guard-core
 ```
 
 ## Quick Start (Offline Mode)
